@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 target_url = "https://www.saucedemo.com/v1/inventory.html"
@@ -16,10 +17,19 @@ password = driver.find_element(By.XPATH, "//div[@class='login-box']//input[@name
 btn_login = driver.find_element(By.XPATH, "//div[@class='login-box']//input[@type='submit']").click()
 assert driver.current_url == target_url
 
-for i in range(1,4,1):
-    add_to_cart = driver.find_element(By.XPATH, f"(//button[@class='btn_primary btn_inventory'])[{i}]").click()
-    btn = driver.find_element(By.XPATH, f"(//button[@class='btn_secondary btn_inventory'])[{i}]").text
-    assert btn.lower() == "remove"
-    print(f"Prduto {i} Adicionado ao carrinho")
-
-sleep(2)
+for i in range(1,6,1):
+    product = driver.find_element(By.XPATH, f"(//*[@class='inventory_item'])[{i}]//div[@class='inventory_item_label']//a//div").click()
+    description = driver.find_element(By.XPATH, "//div[@class='inventory_details_name']").text
+    add_to_cart = driver.find_element(By.XPATH, "//button[@class='btn_primary btn_inventory']").click()
+    cart = driver.find_element(By.XPATH, "//*[@fill='currentColor']").click()
+    assert description == driver.find_element(By.XPATH, f"(//div[@class='cart_item'])[{i}]//div[@class='inventory_item_name']").text, "Item não encontrado no carrinho"
+    add_to_cart = driver.find_element(By.XPATH, "//a[@class='btn_secondary']").click()
+    
+driver.find_element(By.XPATH, "//*[@fill='currentColor']").click()
+driver.find_element(By.XPATH, "//a[@class='btn_action checkout_button']").click()
+driver.find_element(By.ID, "first-name").send_keys("Username")
+driver.find_element(By.ID, "last-name").send_keys("Aristidiles")
+driver.find_element(By.ID, "postal-code").send_keys("00000-000")
+driver.find_element(By.XPATH, "//input[@class='btn_primary cart_button']").click()
+driver.find_element(By.XPATH, "//a[@class='btn_action cart_button']").click()
+assert driver.find_element(By.XPATH, "//h2[@class='complete-header']").is_displayed()
